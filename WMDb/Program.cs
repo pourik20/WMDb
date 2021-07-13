@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace WMDb
 {
-    public class Program
+    public class MovieProgram
     {
         public static void Main(string[] args)
         {

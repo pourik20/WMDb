@@ -1,7 +1,44 @@
 ﻿@page "/movies"
 
 <h3>Movies</h3>
+<br />
+<table class="table table-hover">
+    <tr class="font-weight-bold">
+        <td>Title</td>
+        <td>Length</td>
+        <td>Rating</td>
+    </tr>
+    <tbody>
+        @foreach (var movie in this.movies)
+        {
+        <tr>
+            <td>@movie.Name</td>
+            <td>@movie.Length minut</td>
+            <td>@movie.Rating%</td>
+        </tr>
+        }
+    </tbody>
+</table>
 
 @code {
+
+    private List<Movie> movies;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        Random rn = new Random();
+        int moviesCount = 20;
+        movies = new List<Movie>();
+
+        for (int i = 0; i < moviesCount; i++)
+        {
+            string title = $"Movie {i + 1}";
+            int length = rn.Next(60, 180);
+            int rating = rn.Next(1, 101);
+            movies.Add(new Movie(title, length, rating));
+        }
+    }
 
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MovieDB
+namespace WMDb
 {
     /// <summary>
     /// Třída reprezentuje film v databázi
