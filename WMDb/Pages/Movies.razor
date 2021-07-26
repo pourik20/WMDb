@@ -1,44 +1,112 @@
 ﻿@page "/movies"
 
-<h3>Movies</h3>
+@using DataAccessLibrary
+@using DataAccessLibrary.Models
+@using WMDb.Models
+
+@inject IMoviesData _db
+
+<h3>Filmová databáze</h3>
 <br />
-<table class="table table-hover">
-    <tr class="font-weight-bold">
-        <td>Title</td>
-        <td>Length</td>
-        <td>Rating</td>
-    </tr>
-    <tbody>
-        @foreach (var movie in this.movies)
-        {
-        <tr>
-            <td>@movie.Name</td>
-            <td>@movie.Length minut</td>
-            <td>@movie.Rating%</td>
-        </tr>
-        }
-    </tbody>
-</table>
+<h4>Přidat film</h4>
+<EditForm Model="@newMovie" OnValidSubmit="@InsertMovie">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label>
+            Název
+        </label>
+            <InputText id="title" @bind-Value="@newMovie.Title" />
+        
+    </div>
+    <div class="form-group">
+        <label>
+            Režisér
+        </label>
+            <InputText id="director" @bind-Value="@newMovie.Director" />
+        
+    </div>
+    <div class="form-group">
+        <label>
+            Délka
+        </label>
+            <InputNumber id="length" @bind-Value="@newMovie.Length" />
+        
+    </div>
+    <div class="form-group">
+        <label>
+            Hodnocení
+        </label>
+            <InputNumber id="rating" @bind-Value="@newMovie.Rating" />
+        
+    </div>
+
+    <button type="submit" class="btn btn-primary">Přidat</button>
+</EditForm>
+<br />
+
+@if (movies is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Název</th>
+                <th>Režisér</th>
+                <th>Délka</th>
+                <th>Hodnocení</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var movie in movies)
+            {
+            <tr>
+                <td>@movie.Title</td>
+                <td>@movie.Director</td>
+                <td>@movie.Length minut</td>
+                @if (movie.Rating >= 70)
+                {
+                    <td class="text-danger">@movie.Rating%</td>
+                }
+                else
+                {
+                    <td>@movie.Rating%</td>
+                }
+            </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @code {
 
-    private List<Movie> movies;
+    private List<MovieModel> movies;
+    private DisplayMovieModel newMovie = new DisplayMovieModel();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        movies = await _db.GetMovies();
+    }
 
-        Random rn = new Random();
-        int moviesCount = 20;
-        movies = new List<Movie>();
-
-        for (int i = 0; i < moviesCount; i++)
+    private async Task InsertMovie()
+    {
+        // Mapování
+        MovieModel m = new MovieModel
         {
-            string title = $"Movie {i + 1}";
-            int length = rn.Next(60, 180);
-            int rating = rn.Next(1, 101);
-            movies.Add(new Movie(title, length, rating));
-        }
+            Title = newMovie.Title,
+            Director = newMovie.Director,
+            Length = newMovie.Length,
+            Rating = newMovie.Rating
+        };
+
+        await _db.InsertMovie(m);
+
+        movies.Add(m);
+
+        newMovie = new DisplayMovieModel();
     }
 
 }
