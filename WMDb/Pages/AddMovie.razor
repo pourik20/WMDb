@@ -1,0 +1,66 @@
+﻿@page "/AddMovie"
+
+@using WMDb.Models
+@using DataAccessLibrary
+@using DataAccessLibrary.Models 
+
+@inject IMoviesData _db
+
+<div class="card">
+    <div class="card-header">
+        <h4>Přidat film</h4>
+    </div>
+    <div class="card-body">
+        <EditForm Model="@newMovie" OnValidSubmit="@InsertMovie">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="title">Název</label>    <br />
+                <InputText id="title" @bind-Value="@newMovie.Title" />
+            </div>
+            <div class="form-group">
+                <label for="director">Režisér</label>   <br />
+                <InputText id="director" @bind-Value="@newMovie.Director" />
+            </div>
+            <div class="form-group">
+                <label>Délka [min]</label>  <br />
+                <InputNumber id="length" @bind-Value="@newMovie.Length" />
+            </div>
+            <div class="form-group">
+                <label for="rating">Hodnocení [%]</label>   <br />
+                <InputNumber id="rating" @bind-Value="@newMovie.Rating" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Přidat</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+
+    private DisplayMovieModel newMovie = new DisplayMovieModel();
+
+    private List<MovieModel> movies;
+
+    protected override async Task OnInitializedAsync()
+    {
+        movies = await _db.GetMovies();
+    }
+
+    private async Task InsertMovie()
+    {
+        MovieModel m = new MovieModel
+        {
+            Title = newMovie.Title,
+            Director = newMovie.Director,
+            Length = newMovie.Length,
+            Rating = newMovie.Rating
+        };
+
+        await _db.InsertMovie(m);
+
+        movies.Add(m);
+
+        newMovie = new DisplayMovieModel();
+    }
+}

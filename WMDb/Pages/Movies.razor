@@ -8,42 +8,6 @@
 
 <h3>Filmová databáze</h3>
 <br />
-<h4>Přidat film</h4>
-<EditForm Model="@newMovie" OnValidSubmit="@InsertMovie">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="form-group">
-        <label>
-            Název
-        </label>
-            <InputText id="title" @bind-Value="@newMovie.Title" />
-        
-    </div>
-    <div class="form-group">
-        <label>
-            Režisér
-        </label>
-            <InputText id="director" @bind-Value="@newMovie.Director" />
-        
-    </div>
-    <div class="form-group">
-        <label>
-            Délka
-        </label>
-            <InputNumber id="length" @bind-Value="@newMovie.Length" />
-        
-    </div>
-    <div class="form-group">
-        <label>
-            Hodnocení
-        </label>
-            <InputNumber id="rating" @bind-Value="@newMovie.Rating" />
-        
-    </div>
-
-    <button type="submit" class="btn btn-primary">Přidat</button>
-</EditForm>
-<br />
 
 @if (movies is null)
 {
@@ -51,12 +15,12 @@
 }
 else
 {
-    <table class="table table-striped">
+    <table class="table table-striped table-bordered">
         <thead>
             <tr>
                 <th>Název</th>
                 <th>Režisér</th>
-                <th>Délka</th>
+                <th>Délka [min]</th>
                 <th>Hodnocení</th>
             </tr>
         </thead>
@@ -66,10 +30,14 @@ else
             <tr>
                 <td>@movie.Title</td>
                 <td>@movie.Director</td>
-                <td>@movie.Length minut</td>
+                <td>@movie.Length</td>
                 @if (movie.Rating >= 70)
                 {
                     <td class="text-danger">@movie.Rating%</td>
+                }
+                else if (movie.Rating <= 50)
+                {
+                    <td class="text-info">@movie.Rating%</td>
                 }
                 else
                 {
@@ -84,29 +52,10 @@ else
 @code {
 
     private List<MovieModel> movies;
-    private DisplayMovieModel newMovie = new DisplayMovieModel();
 
     protected override async Task OnInitializedAsync()
     {
         movies = await _db.GetMovies();
-    }
-
-    private async Task InsertMovie()
-    {
-        // Mapování
-        MovieModel m = new MovieModel
-        {
-            Title = newMovie.Title,
-            Director = newMovie.Director,
-            Length = newMovie.Length,
-            Rating = newMovie.Rating
-        };
-
-        await _db.InsertMovie(m);
-
-        movies.Add(m);
-
-        newMovie = new DisplayMovieModel();
     }
 
 }

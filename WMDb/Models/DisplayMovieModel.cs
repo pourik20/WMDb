@@ -8,12 +8,12 @@ namespace WMDb.Models
 {
     public class DisplayMovieModel
     {
-        [Required]
+        [Required(ErrorMessage = "Zadejte název filmu")]
         [StringLength(100, ErrorMessage = "Název je příliš dlouhý.")]
-        [MinLength(1, ErrorMessage = "Zadejte název filmu.")]
         public string Title { get; set; }
         public string Director { get; set; }
         public int Length { get; set; }
+        [Range(0, 100, ErrorMessage = "Zadejte číslo od 0 do 100")]
         public int Rating { get; set; }
     }
 }
